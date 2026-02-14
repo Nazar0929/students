@@ -1,0 +1,63 @@
+<!DOCTYPE html><html lang=en><meta charset=UTF-8><meta name=viewport content="width=device-width, initial-scale=1.0"><title>CRUD Students</title><link rel=stylesheet href=/students/Students.c4c9a69f.css><body>
+  <div class=container>
+    <h1>Список студентів</h1>
+
+    <button id=get-students-btn>Отримати студентів</button>
+
+    <table id=students-table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Ім'я</th>
+          <th>Вік</th>
+          <th>Курс</th>
+          <th>Навички</th>
+          <th>Email</th>
+          <th>Статус</th>
+          <th>Дії</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+
+    <h2>Додати нового студента</h2>
+
+    <form id=add-student-form>
+      <label>
+        Ім'я:
+        <input name=name required>
+      </label>
+
+      <label>
+        Вік:
+        <input type=number name=age required>
+      </label>
+
+      <label>
+        Курс:
+        <input name=course required>
+      </label>
+
+      <label>
+        Навички (через кому):
+        <input name=skills required>
+      </label>
+
+      <label>
+        Email:
+        <input type=email name=email required>
+      </label>
+
+      <label>
+        Записаний:
+        <input type=checkbox name=isEnrolled>
+      </label>
+
+      <button>Додати студента</button>
+    </form>
+  </div>
+
+  <script type=module src=/students/Students.d54589be.js></script>
+
+
