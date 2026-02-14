@@ -33,6 +33,9 @@ function renderStudents(array) {
   tableBody.innerHTML = markup;
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  getstuAPI().then(res => renderStudents(res));
+});
 
 
 
@@ -103,7 +106,7 @@ tableBody.addEventListener("click", (event) => {
     form.elements.isEnrolled.checked =
       cells[6].textContent === "Так";
   }
-getstuAPI().then(res => renderStudents(res));
+
 
 
 });
