@@ -1,0 +1,33 @@
+{
+  "name": "students",
+  "version": "1.0.0",
+  "description": "",
+  "browserslist": "> 0.5%, last 2 versions, not dead",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx parcel src/index.html",
+    "build": "parcel build src/index.html --public-url /students/",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
+    "server": "npx json-server students.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nazar0929/students.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nazar0929/students/issues"
+  },
+  "homepage": "https://github.com/Nazar0929/students#readme",
+  "dependencies": {
+    "gh-pages": "^6.3.0",
+    "json-server": "^1.0.0-beta.5",
+    "parcel": "^2.16.4"
+  },
+  "devDependencies": {
+    "parcel": "^2.16.4"
+  }
+}
