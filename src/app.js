@@ -103,5 +103,7 @@ tableBody.addEventListener("click", (event) => {
     form.elements.isEnrolled.checked =
       cells[6].textContent === "Так";
   }
+getstuAPI().then(res => renderStudents(res));
+
 
 });
