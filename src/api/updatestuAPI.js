@@ -1,12 +1,30 @@
-export const updatestuAPI = (id, student) => {
-  const options = {
-    method: "PATCH",
-    body: JSON.stringify(student),
-    headers: {
-      "Content-Type": "application/json; charset=UTF-8",
-    },
-  };
+// export const updatestuAPI = (id, student) => {
+//   const options = {
+//     method: "PATCH",
+//     body: JSON.stringify(student),
+//     headers: {
+//       "Content-Type": "application/json; charset=UTF-8",
+//     },
+//   };
 
-  return fetch(`http://localhost:3000/students/${id}`, options)
-    .then((res) => res.json());
-};
+//   return fetch(`http://localhost:3000/students/${id}`, options)
+//     .then((res) => res.json());
+// };
+
+
+
+export async function updatestuAPI(id, student) {
+  try {
+    const res = await fetch("http://localhost:3000/students/" + id, {
+      method: "PATCH",
+      body: JSON.stringify(student),
+      headers: {
+        "Content-Type": "application/json; charset=UTF-8",
+      },
+    });
+    return await res.json();
+  } catch (err) {
+    console.log("Не удалось обновить студента", err);
+    throw err;
+  }
+}
