@@ -725,30 +725,40 @@ let currentEdit = null;
 function renderStudents(array) {
     const markup = array.map(({ id, name, age, course, skills, email, isEnrolled })=>{
         return `
-        <tr id="${id}">
-          <td>${id}</td>
-          <td>${name}</td>
-          <td>${age}</td>
-          <td>${course}</td>
-          <td>${skills.join(", ")}</td>
-          <td>${email}</td>
-          <td>${isEnrolled ? "\u0422\u0430\u043A" : "\u041D\u0456"}</td>
-          <td>
-            <button data-action="delete">\u{412}\u{438}\u{434}\u{430}\u{43B}\u{438}\u{442}\u{438}</button>
-            <button data-action="edit">\u{41E}\u{43D}\u{43E}\u{432}\u{438}\u{442}\u{438}</button>
-          </td>
-        </tr>
+      <tr id="${id}">
+      <td>${id}</td>
+      <td>${name}</td>
+      <td>${age}</td>
+      <td>${course}</td>
+      <td>${skills.join(", ")}</td>
+      <td>${email}</td>
+      <td>${isEnrolled ? "\u0422\u0430\u043A" : "\u041D\u0456"}</td>
+      <td>
+      <button data-action="delete">\u{412}\u{438}\u{434}\u{430}\u{43B}\u{438}\u{442}\u{438}</button>
+      <button data-action="edit">\u{41E}\u{43D}\u{43E}\u{432}\u{438}\u{442}\u{438}</button>
+      </td>
+      </tr>
       `;
     }).join("");
     tableBody.innerHTML = markup;
 }
-document.addEventListener("DOMContentLoaded", ()=>{
-    (0, _getstuAPIJs.getstuAPI)().then((res)=>renderStudents(res));
+document.addEventListener("DOMContentLoaded", async ()=>{
+    try {
+        const res = await (0, _getstuAPIJs.getstuAPI)();
+        renderStudents(res);
+    } catch (err) {
+        console.log("\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044C \u0441\u0442\u0443\u0434\u0435\u043D\u0442\u043E\u0432", err);
+    }
 });
-getBtn.addEventListener("click", ()=>{
-    (0, _getstuAPIJs.getstuAPI)().then((res)=>renderStudents(res));
+getBtn.addEventListener("click", async ()=>{
+    try {
+        const res = await (0, _getstuAPIJs.getstuAPI)();
+        renderStudents(res);
+    } catch (err) {
+        console.log("\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044C \u0441\u0442\u0443\u0434\u0435\u043D\u0442\u043E\u0432", err);
+    }
 });
-form.addEventListener("submit", (event)=>{
+form.addEventListener("submit", async (event)=>{
     event.preventDefault();
     const elements = event.currentTarget.elements;
     const studentData = {
@@ -759,41 +769,61 @@ form.addEventListener("submit", (event)=>{
         email: elements.email.value.trim(),
         isEnrolled: elements.isEnrolled.checked
     };
-    if (currentEdit) (0, _updatestuAPIJs.updatestuAPI)(currentEdit, studentData).then(()=>{
-        currentEdit = null;
+    try {
+        if (currentEdit) {
+            await (0, _updatestuAPIJs.updatestuAPI)(currentEdit, studentData);
+            currentEdit = null;
+        } else await (0, _poststuAPIJs.poststuAPI)(studentData);
         form.reset();
-        return (0, _getstuAPIJs.getstuAPI)();
-    }).then((res)=>renderStudents(res));
-    else (0, _poststuAPIJs.poststuAPI)(studentData).then(()=>{
-        form.reset();
-        return (0, _getstuAPIJs.getstuAPI)();
-    }).then((res)=>renderStudents(res));
+        const res = await (0, _getstuAPIJs.getstuAPI)();
+        renderStudents(res);
+    } catch (err) {
+        console.log("\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0441\u0442\u0443\u0434\u0435\u043D\u0442\u0430", err);
+    }
 });
-tableBody.addEventListener("click", (event)=>{
+tableBody.addEventListener("click", async (event)=>{
     const action = event.target.dataset.action;
     if (!action) return;
     const row = event.target.closest("tr");
     const id = Number(row.id);
-    if (action === "delete") (0, _delstuAPIJs.delstuAPI)(id).then(()=>(0, _getstuAPIJs.getstuAPI)()).then((res)=>renderStudents(res));
-    if (action === "edit") {
-        currentEdit = Number(row.id);
-        const cells = row.children;
-        form.elements.name.value = cells[1].textContent;
-        form.elements.age.value = cells[2].textContent;
-        form.elements.course.value = cells[3].textContent;
-        form.elements.skills.value = cells[4].textContent;
-        form.elements.email.value = cells[5].textContent;
-        form.elements.isEnrolled.checked = cells[6].textContent === "\u0422\u0430\u043A";
+    try {
+        if (action === "delete") {
+            await (0, _delstuAPIJs.delstuAPI)(id);
+            const res = await (0, _getstuAPIJs.getstuAPI)();
+            renderStudents(res);
+        }
+        if (action === "edit") {
+            currentEdit = id;
+            const cells = row.children;
+            form.elements.name.value = cells[1].textContent;
+            form.elements.age.value = cells[2].textContent;
+            form.elements.course.value = cells[3].textContent;
+            form.elements.skills.value = cells[4].textContent;
+            form.elements.email.value = cells[5].textContent;
+            form.elements.isEnrolled.checked = cells[6].textContent === "\u0422\u0430\u043A";
+        }
+    } catch (err) {
+        console.log("\u0421\u0442\u0430\u043B\u0430\u0441\u044F \u043F\u043E\u043C\u0438\u043B\u043A\u0430 \u043F\u0440\u0438 \u043E\u0431\u0440\u043E\u0431\u0446\u0456 \u0434\u0456\u0457", err);
     }
 });
 
 },{"./api/getstuAPI.js":"7BFNK","./api/poststuAPI.js":"2Yo1v","./api/delstuAPI.js":"6wTOk","./api/updatestuAPI.js":"ljuNH"}],"7BFNK":[function(require,module,exports,__globalThis) {
+// export const getstuAPI = () => {
+//   return fetch("http://localhost:3000/students")
+//     .then((res) => res.json());
+// };
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "getstuAPI", ()=>getstuAPI);
-const getstuAPI = ()=>{
-    return fetch("http://localhost:3000/students").then((res)=>res.json());
-};
+async function getstuAPI() {
+    try {
+        const res = await fetch("http://localhost:3000/students");
+        return await res.json();
+    } catch (err) {
+        console.log("\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u043F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0441\u043F\u0438\u0441\u043E\u043A \u0441\u0442\u0443\u0434\u0435\u043D\u0442\u043E\u0432", err);
+        throw err;
+    }
+}
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"jnFvT":[function(require,module,exports,__globalThis) {
 exports.interopDefault = function(a) {
@@ -826,44 +856,87 @@ exports.export = function(dest, destName, get) {
 };
 
 },{}],"2Yo1v":[function(require,module,exports,__globalThis) {
+// export const poststuAPI = (student) => {
+//   const options = {
+//     method: "POST",
+//     body: JSON.stringify(student),
+//     headers: {
+//       "Content-Type": "application/json; charset=UTF-8",
+//     },
+//   };
+//   return fetch("http://localhost:3000/students", options)
+//     .then((res) => res.json());
+// };
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "poststuAPI", ()=>poststuAPI);
-const poststuAPI = (student)=>{
-    const options = {
-        method: "POST",
-        body: JSON.stringify(student),
-        headers: {
-            "Content-Type": "application/json; charset=UTF-8"
-        }
-    };
-    return fetch("http://localhost:3000/students", options).then((res)=>res.json());
-};
+async function poststuAPI(student) {
+    try {
+        const res = await fetch("http://localhost:3000/students", {
+            method: "POST",
+            body: JSON.stringify(student),
+            headers: {
+                "Content-Type": "application/json; charset=UTF-8"
+            }
+        });
+        return await res.json();
+    } catch (err) {
+        console.log("\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0434\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0441\u0442\u0443\u0434\u0435\u043D\u0442\u0430", err);
+        throw err;
+    }
+}
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"6wTOk":[function(require,module,exports,__globalThis) {
+// export const delstuAPI = (id) => {
+//   return fetch(`http://localhost:3000/students/${id}`, {
+//     method: "DELETE",
+//   }).then((res) => res.json());
+// };
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "delstuAPI", ()=>delstuAPI);
-const delstuAPI = (id)=>{
-    return fetch(`http://localhost:3000/students/${id}`, {
-        method: "DELETE"
-    }).then((res)=>res.json());
-};
+async function delstuAPI(id) {
+    try {
+        const res = await fetch("http://localhost:3000/students/" + id, {
+            method: "DELETE"
+        });
+        return await res.json();
+    } catch (err) {
+        console.log("\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0443\u0434\u0430\u043B\u0438\u0442\u044C \u0441\u0442\u0443\u0434\u0435\u043D\u0442\u0430", err);
+        throw err;
+    }
+}
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"ljuNH":[function(require,module,exports,__globalThis) {
+// export const updatestuAPI = (id, student) => {
+//   const options = {
+//     method: "PATCH",
+//     body: JSON.stringify(student),
+//     headers: {
+//       "Content-Type": "application/json; charset=UTF-8",
+//     },
+//   };
+//   return fetch(`http://localhost:3000/students/${id}`, options)
+//     .then((res) => res.json());
+// };
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "updatestuAPI", ()=>updatestuAPI);
-const updatestuAPI = (id, student)=>{
-    const options = {
-        method: "PATCH",
-        body: JSON.stringify(student),
-        headers: {
-            "Content-Type": "application/json; charset=UTF-8"
-        }
-    };
-    return fetch(`http://localhost:3000/students/${id}`, options).then((res)=>res.json());
-};
+async function updatestuAPI(id, student) {
+    try {
+        const res = await fetch("http://localhost:3000/students/" + id, {
+            method: "PATCH",
+            body: JSON.stringify(student),
+            headers: {
+                "Content-Type": "application/json; charset=UTF-8"
+            }
+        });
+        return await res.json();
+    } catch (err) {
+        console.log("\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u043E\u0431\u043D\u043E\u0432\u0438\u0442\u044C \u0441\u0442\u0443\u0434\u0435\u043D\u0442\u0430", err);
+        throw err;
+    }
+}
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["7wZbQ","2R06K"], "2R06K", "parcelRequire5a4c", {})
 
